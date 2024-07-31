@@ -2,31 +2,15 @@ pipeline{
     agent any
 
     stages{
-        stage('Build Jar'){
+        stage('Start Test'){
             steps{
-                bat "mvn clean package -DskipTests"
+                bat "docker-compose up"
             }
         }
-        stage('Generate Image'){
+        stage('Stop Test'){
             steps{
-                bat "docker build -t=shahidsyed99/selenium ."
+                bat "docker-compose down"
             }
          }
-        stage('Push Image'){
-            environment{
-                DOCKER_HUB = credentials('dockerhub-creds')
-            }
-           steps{
-                bat 'docker login -u %DOCKER_HUB_USR% -p %DOCKER_HUB_PSW%'
-                bat "docker push shahidsyed99/selenium:latest"
-                bat "docker tag shahidsyed99/selenium:latest shahidsyed99/selenium:${env.BUILD_NUMBER}"
-                bat "docker push shahidsyed99/selenium:${env.BUILD_NUMBER}"
-            }
-         }
-    }
-    post{
-        always{
-            bat "docker logout"
-        }
     }
 }
